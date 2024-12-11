@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation System</title>
+    <link rel="stylesheet" href="style.css"
+</head>
+<body>
+    <div class="container">
+        <h1>Movie Recommendation System</h1>
+        <form id="rating-form">
+            <h3>Rate the Following Movies:</h3>
+            <div id="movie-list">
+                {% for movie in movies %}
+                <div class="movie">
+                    <label>{{ movie['title'] }}</label>
+                    <select class="rating" data-movie-id="{{ movie['movieId'] }}">
+                        <option value="">Rate</option>
+                        <option value="1">1</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5</option>
+                    </select>
+                </div>
+                {% endfor %}
+            </div>
+
+            <button type="submit">Get Recommendations</button>
+        </form>
+
+        <h3>Or select your favorite genres:</h3>
+        <div id="genre-selection">
+            <label><input type="checkbox" name="genre" value="Action"> Action</label>
+            <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+            <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
+            <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
+            <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
+            <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+        </div>
+        <button id="no-movies" type="button">I Haven't Watched These Movies</button>
+
+        <div id="recommendations"></div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

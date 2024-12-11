@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMate Recommendations</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+</head>
+<body>
+    <h1>Recommended Movies</h1>
+    <div id="recommendationSection">
+        <p>Loading your personalized recommendations...</p>
+    </div>
+    <button onclick="goBack()">Go Back</button>
+
+    <script>
+        async function fetchRecommendations() {
+            const params = new URLSearchParams(window.location.search);
+            const userId = params.get("user_id");
+            const recommendationSection = document.getElementById("recommendationSection");
+
+            try {
+                const response = await fetch(`/recommend?user_id=${userId}`);
+                const data = await response.json();
+
+                if (data.error) {
+                    recommendationSection.innerHTML = `<p>Error: ${data.error}</p>`;
+                } else {
+                    recommendationSection.innerHTML = "<h2>Your Top Recommendations:</h2>";
+                    data.forEach(movie => {
+                        recommendationSection.innerHTML += `
+                            <div class="movie">
+                                <h3>${movie.title} (${movie.avg_rating.toFixed(1)} ⭐)</h3>
+                                <p><strong>Genres:</strong> ${movie.genres}</p>
+                            </div>
+                        `;
+                    });
+                }
+            } catch (error) {
+                recommendationSection.innerHTML = `<p>Error fetching recommendations. Please try again.</p>`;
+            }
+        }
+
+        function goBack() {
+            window.history.back();
+        }
+
+        // Fetch recommendations when the page loads
+        fetchRecommendations();
+    </script>
+</body>
+</html>
