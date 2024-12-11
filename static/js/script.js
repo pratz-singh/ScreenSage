@@ -34,7 +34,7 @@ document.getElementById("no-movies").addEventListener("click", async function ()
     displayRecommendations(data.recommendations);
 });
 
-async function fetchMoviePoster(movieName) {
+async function fetchMovieDetails(movieName) {
     const apiKey = "19f7029362cd02135ed85c4810b35313"; // TMDb API Key
     const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&api_key=${apiKey}`;
 
@@ -43,24 +43,22 @@ async function fetchMoviePoster(movieName) {
         const data = await response.json();
 
         if (data.results && data.results.length > 0) {
-            const posterPath = data.results[0].poster_path;
-            return posterPath
-                ? `https://image.tmdb.org/t/p/w500${posterPath}` // TMDb poster URL
-                : await fetchFallbackPoster(movieName); // Fallback for missing poster
+            const movie = data.results[0]; // Take the first search result
+            return {
+                posterUrl: movie.poster_path
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
+                    : null, // Poster URL or null if unavailable
+                imdbUrl: movie.id
+                    ? `https://www.imdb.com/title/${movie.id}`
+                    : "https://www.imdb.com/", // IMDb URL if available
+            };
         } else {
-            return await fetchFallbackPoster(movieName); // Fallback if movie not found
+            return { posterUrl: null, imdbUrl: "https://www.imdb.com/" }; // Default IMDb link
         }
     } catch (error) {
-        console.error(`Error fetching poster for ${movieName}:`, error);
-        return "https://via.placeholder.com/200x300?text=Error+Loading+Poster"; // Placeholder for errors
+        console.error(`Error fetching details for ${movieName}:`, error);
+        return { posterUrl: null, imdbUrl: "https://www.imdb.com/" }; // Handle errors
     }
-}
-
-async function fetchFallbackPoster(movieName) {
-    // Attempt IMDb link as fallback
-    const imdbSearchUrl = `https://www.imdb.com/find?q=${encodeURIComponent(movieName)}`;
-    console.warn(`Fallback: IMDb search URL - ${imdbSearchUrl}`);
-    return imdbSearchUrl;
 }
 
 async function displayRecommendations(recommendations) {
@@ -73,29 +71,31 @@ async function displayRecommendations(recommendations) {
         container.className = "recommendation-container";
 
         for (const movie of recommendations) {
-            const posterUrl = await fetchMoviePoster(movie); // Fetch poster for each movie
+            const { posterUrl, imdbUrl } = await fetchMovieDetails(movie);
 
             // Create a card for each movie
             const card = document.createElement("div");
             card.className = "movie-card";
 
             const poster = document.createElement("img");
-            poster.src = posterUrl;
+            poster.src = posterUrl
+                ? posterUrl
+                : "https://via.placeholder.com/200x300?text=No+Poster"; // Display placeholder if no poster
             poster.alt = `${movie} Poster`;
             poster.className = "movie-poster";
 
             const title = document.createElement("h3");
             title.textContent = movie;
 
-            const link = document.createElement("a");
-            link.href = posterUrl.includes("imdb") ? posterUrl : "#";
-            link.textContent = "More Info";
-            link.target = "_blank";
-            link.style.color = "blue";
+            const moreInfo = document.createElement("a");
+            moreInfo.href = imdbUrl;
+            moreInfo.textContent = "More Info";
+            moreInfo.target = "_blank"; // Open IMDb page in a new tab
+            moreInfo.style.color = "blue";
 
             card.appendChild(poster);
             card.appendChild(title);
-            card.appendChild(link);
+            card.appendChild(moreInfo);
             container.appendChild(card);
         }
 
@@ -105,3 +105,28 @@ async function displayRecommendations(recommendations) {
     }
 }
 
+// Load movie posters on page reload
+window.addEventListener("DOMContentLoaded", async function () {
+    const savedRecommendations = JSON.parse(localStorage.getItem("recommendations") || "[]");
+    if (savedRecommendations.length > 0) {
+        displayRecommendations(savedRecommendations);
+    }
+});
+
+// Save recommendations to localStorage
+document.getElementById("no-movies").addEventListener("click", async function () {
+    const selectedGenres = Array.from(document.querySelectorAll("input[name='genre']:checked"))
+        .map(checkbox => checkbox.value);
+
+    const response = await fetch("/recommend-genres", {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ genres: selectedGenres }),
+    });
+
+    const data = await response.json();
+    localStorage.setItem("recommendations", JSON.stringify(data.recommendations)); // Save to localStorage
+    displayRecommendations(data.recommendations);
+});
