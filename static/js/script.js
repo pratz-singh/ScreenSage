@@ -22,8 +22,7 @@ document.getElementById("no-movies").addEventListener("click", async function ()
     const selectedGenres = Array.from(document.querySelectorAll("input[name='genre']:checked"))
         .map(checkbox => checkbox.value);
 
-    // Simulate getting movie titles based on genres
-    const recommendedMovies = await fetch("/recommend-genres", {
+    const response = await fetch("/recommend-genres", {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
@@ -31,52 +30,60 @@ document.getElementById("no-movies").addEventListener("click", async function ()
         body: JSON.stringify({ genres: selectedGenres }),
     });
 
-    const movieTitles = await recommendedMovies.json();
-
-    // Fetch posters from OMDb API
-    const recommendations = await Promise.all(
-        movieTitles.map(async (movieTitle) => {
-            const response = await fetch(
-                `https://www.omdbapi.com/?t=${encodeURIComponent(movieTitle)}&apikey=b5588811`
-            );
-            const data = await response.json();
-            return {
-                title: data.Title || movieTitle,
-                posterUrl: data.Poster !== "N/A" ? data.Poster : "placeholder-image-url.jpg", // Fallback poster
-                id: data.imdbID || "",
-            };
-        })
-    );
-
-    displayRecommendations(recommendations);
+    const data = await response.json();
+    displayRecommendations(data.recommendations);
 });
 
-function displayRecommendations(recommendations) {
-    const container = document.getElementById("recommendation-container");
-    container.innerHTML = ""; // Clear existing recommendations
+async function fetchMoviePoster(movieName) {
+    const apiKey = "b5588811"; // Your OMDb API key
+    const url = `https://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${apiKey}`;
 
-    recommendations.forEach((movie) => {
-        const card = document.createElement("div");
-        card.className = "movie-card";
+    try {
+        const response = await fetch(url);
+        const data = await response.json();
 
-        const poster = document.createElement("img");
-        poster.src = movie.posterUrl;
-        poster.alt = `${movie.title} Poster`;
-        poster.className = "movie-poster";
+        if (data.Response === "True") {
+            return data.Poster; // Return the poster URL if the movie is found
+        } else {
+            return "https://via.placeholder.com/200x300?text=Poster+Not+Available"; // Placeholder for missing poster
+        }
+    } catch (error) {
+        console.error(`Error fetching poster for ${movieName}:`, error);
+        return "https://via.placeholder.com/200x300?text=Error+Loading+Poster"; // Placeholder for errors
+    }
+}
 
-        const title = document.createElement("h3");
-        title.textContent = movie.title;
+async function displayRecommendations(recommendations) {
+    const recommendationsDiv = document.getElementById("recommendations");
+    recommendationsDiv.innerHTML = ""; // Clear existing content
 
-        const moreInfo = document.createElement("a");
-        moreInfo.href = `https://www.imdb.com/title/${movie.id}`;
-        moreInfo.target = "_blank";
-        moreInfo.textContent = "More Info";
-        moreInfo.className = "more-info";
+    if (recommendations.length > 0) {
+        recommendationsDiv.innerHTML = "<h3>Recommendations:</h3>";
+        const container = document.createElement("div");
+        container.className = "recommendation-container";
 
-        card.appendChild(poster);
-        card.appendChild(title);
-        card.appendChild(moreInfo);
+        for (const movie of recommendations) {
+            const posterUrl = await fetchMoviePoster(movie); // Fetch poster for each movie
 
-        container.appendChild(card);
-    });
+            // Create a card for each movie
+            const card = document.createElement("div");
+            card.className = "movie-card";
+
+            const poster = document.createElement("img");
+            poster.src = posterUrl;
+            poster.alt = `${movie} Poster`;
+            poster.className = "movie-poster";
+
+            const title = document.createElement("h3");
+            title.textContent = movie;
+
+            card.appendChild(poster);
+            card.appendChild(title);
+            container.appendChild(card);
+        }
+
+        recommendationsDiv.appendChild(container);
+    } else {
+        recommendationsDiv.innerHTML = "<p>No recommendations available.</p>";
+    }
 }
