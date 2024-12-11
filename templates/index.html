@@ -3,46 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Recommendation System</title>
-    <link rel="stylesheet" href="style.css"
+    <title>Personalized Movie Recommendation</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
-    <div class="container">
-        <h1>Movie Recommendation System</h1>
-        <form id="rating-form">
-            <h3>Rate the Following Movies:</h3>
-            <div id="movie-list">
-                {% for movie in movies %}
-                <div class="movie">
-                    <label>{{ movie['title'] }}</label>
-                    <select class="rating" data-movie-id="{{ movie['movieId'] }}">
-                        <option value="">Rate</option>
-                        <option value="1">1</option>
-                        <option value="2">2</option>
-                        <option value="3">3</option>
-                        <option value="4">4</option>
-                        <option value="5">5</option>
-                    </select>
+    <header>
+        <h1>CineMate</h1>
+        <nav>
+            <ul>
+                <li><a href="#recommendations">Home</a></li>
+                <li><a href="#preferences">Set Preferences</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Recommendations Section -->
+        <section id="recommendations">
+            <form id="rating-form">
+                <h3>Rate the Following Movies:</h3>
+                <div id="movie-list">
+                    {% for movie in movies %}
+                    <div class="movie">
+                        <label>{{ movie['title'] }}</label>
+                        <select class="rating" data-movie-id="{{ movie['movieId'] }}">
+                            <option value="">Rate</option>
+                            <option value="1">1</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5</option>
+                        </select>
+                    </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+    
+                <button type="submit">Get Recommendations</button>
+            </form>
+          
+        </section>
+
+        <!-- Preferences Section -->
+        <section id="preferences">
+            <h3>Or select your favorite genres:</h3>
+            <div id="genre-selection">
+                <label><input type="checkbox" name="genre" value="Action"> Action</label>
+                <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+                <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
+                <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
+                <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
+                <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
             </div>
-
-            <button type="submit">Get Recommendations</button>
-        </form>
-
-        <h3>Or select your favorite genres:</h3>
-        <div id="genre-selection">
-            <label><input type="checkbox" name="genre" value="Action"> Action</label>
-            <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
-            <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
-            <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
-            <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
-            <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+            <button id="no-movies" type="button">I Haven't Watched These Movies</button>
+            <div id="recommendations"></div>
         </div>
-        <button id="no-movies" type="button">I Haven't Watched These Movies</button>
+        </section>
+    </main>
 
-        <div id="recommendations"></div>
-    </div>
-    <script src="script.js"></script>
+    <footer>
+        <p>&copy;CineMate. All rights reserved.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </body>
 </html>
