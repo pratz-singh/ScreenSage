@@ -31,7 +31,9 @@ document.getElementById("no-movies").addEventListener("click", async function ()
     });
 
     const data = await response.json();
-    displayRecommendations(data.recommendations);
+    const limitedRecommendations = data.recommendations.slice(0, 10); // Limit to 10 movies
+    localStorage.setItem("recommendations", JSON.stringify(limitedRecommendations)); // Save to localStorage
+    displayRecommendations(limitedRecommendations);
 });
 
 async function fetchMovieDetails(movieName) {
@@ -49,7 +51,7 @@ async function fetchMovieDetails(movieName) {
                     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                     : null, // Poster URL or null if unavailable
                 imdbUrl: movie.id
-                    ? `https://www.imdb.com/title/${movie.id}`
+                    ? `https://www.imdb.com/title/tt${movie.id}/`
                     : "https://www.imdb.com/", // IMDb URL if available
             };
         } else {
@@ -105,28 +107,10 @@ async function displayRecommendations(recommendations) {
     }
 }
 
-// Load movie posters on page reload
+// Load movie posters on page startup
 window.addEventListener("DOMContentLoaded", async function () {
     const savedRecommendations = JSON.parse(localStorage.getItem("recommendations") || "[]");
     if (savedRecommendations.length > 0) {
-        displayRecommendations(savedRecommendations);
+        await displayRecommendations(savedRecommendations);
     }
-});
-
-// Save recommendations to localStorage
-document.getElementById("no-movies").addEventListener("click", async function () {
-    const selectedGenres = Array.from(document.querySelectorAll("input[name='genre']:checked"))
-        .map(checkbox => checkbox.value);
-
-    const response = await fetch("/recommend-genres", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ genres: selectedGenres }),
-    });
-
-    const data = await response.json();
-    localStorage.setItem("recommendations", JSON.stringify(data.recommendations)); // Save to localStorage
-    displayRecommendations(data.recommendations);
 });
