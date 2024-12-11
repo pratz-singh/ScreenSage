@@ -35,17 +35,18 @@ document.getElementById("no-movies").addEventListener("click", async function ()
 });
 
 async function fetchMoviePoster(movieName) {
-    const apiKey = "b5588811"; // Your OMDb API key
-    const url = `https://www.omdbapi.com/?t=${encodeURIComponent(movieName)}&apikey=${apiKey}`;
+    const apiKey = "19f7029362cd02135ed85c4810b35313"; // TMDb API Key
+    const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&api_key=${apiKey}`;
 
     try {
         const response = await fetch(url);
         const data = await response.json();
 
-        if (data.Response === "True") {
-            return data.Poster; // Return the poster URL if the movie is found
+        if (data.results && data.results.length > 0) {
+            const posterPath = data.results[0].poster_path;
+            return `https://image.tmdb.org/t/p/w500${posterPath}`; // Full URL for the poster
         } else {
-            return "https://via.placeholder.com/200x300?text=Poster+Not+Available"; // Placeholder for missing poster
+            return "https://via.placeholder.com/200x300?text=Poster+Not+Available"; // Placeholder if no poster is found
         }
     } catch (error) {
         console.error(`Error fetching poster for ${movieName}:`, error);
