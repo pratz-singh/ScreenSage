@@ -1,3 +1,55 @@
+// Load movies for rating on startup
+window.addEventListener("DOMContentLoaded", async function () {
+    try {
+        const response = await fetch("/initial-movies"); // Fetch initial movies from the server
+        const movies = await response.json();
+        displayInitialMovies(movies);
+    } catch (error) {
+        console.error("Error loading initial movies:", error);
+    }
+});
+
+// Display initial movies with posters and rating options
+async function displayInitialMovies(movies) {
+    const movieList = document.getElementById("movie-list");
+    movieList.innerHTML = ""; // Clear any existing content
+
+    for (const movie of movies) {
+        const { posterUrl } = await fetchMovieDetails(movie.title);
+
+        const movieDiv = document.createElement("div");
+        movieDiv.className = "movie";
+
+        const poster = document.createElement("img");
+        poster.src = posterUrl
+            ? posterUrl
+            : "https://via.placeholder.com/200x300?text=No+Poster"; // Placeholder if no poster
+        poster.alt = `${movie.title} Poster`;
+        poster.className = "movie-poster";
+
+        const label = document.createElement("label");
+        label.textContent = movie.title;
+
+        const select = document.createElement("select");
+        select.className = "rating";
+        select.dataset.movieId = movie.movieId; // Use the movie ID for rating submission
+        select.innerHTML = `
+            <option value="">Rate</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        `;
+
+        movieDiv.appendChild(poster);
+        movieDiv.appendChild(label);
+        movieDiv.appendChild(select);
+        movieList.appendChild(movieDiv);
+    }
+}
+
+// Handle movie rating submission
 document.getElementById("rating-form").addEventListener("submit", async function (event) {
     event.preventDefault();
 
@@ -18,6 +70,7 @@ document.getElementById("rating-form").addEventListener("submit", async function
     displayRecommendations(data.recommendations);
 });
 
+// Handle genre-based recommendations
 document.getElementById("no-movies").addEventListener("click", async function () {
     const selectedGenres = Array.from(document.querySelectorAll("input[name='genre']:checked"))
         .map(checkbox => checkbox.value);
@@ -36,6 +89,7 @@ document.getElementById("no-movies").addEventListener("click", async function ()
     displayRecommendations(limitedRecommendations);
 });
 
+// Fetch movie details using TMDb
 async function fetchMovieDetails(movieName) {
     const apiKey = "19f7029362cd02135ed85c4810b35313"; // TMDb API Key
     const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&api_key=${apiKey}`;
@@ -50,19 +104,17 @@ async function fetchMovieDetails(movieName) {
                 posterUrl: movie.poster_path
                     ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                     : null, // Poster URL or null if unavailable
-                imdbUrl: movie.id
-                    ? `https://www.imdb.com/title/tt${movie.id}/`
-                    : "https://www.imdb.com/", // IMDb URL if available
             };
         } else {
-            return { posterUrl: null, imdbUrl: "https://www.imdb.com/" }; // Default IMDb link
+            return { posterUrl: null };
         }
     } catch (error) {
         console.error(`Error fetching details for ${movieName}:`, error);
-        return { posterUrl: null, imdbUrl: "https://www.imdb.com/" }; // Handle errors
+        return { posterUrl: null };
     }
 }
 
+// Display recommendations with posters
 async function displayRecommendations(recommendations) {
     const recommendationsDiv = document.getElementById("recommendations");
     recommendationsDiv.innerHTML = ""; // Clear existing content
@@ -73,9 +125,8 @@ async function displayRecommendations(recommendations) {
         container.className = "recommendation-container";
 
         for (const movie of recommendations) {
-            const { posterUrl, imdbUrl } = await fetchMovieDetails(movie);
+            const { posterUrl } = await fetchMovieDetails(movie);
 
-            // Create a card for each movie
             const card = document.createElement("div");
             card.className = "movie-card";
 
@@ -89,15 +140,8 @@ async function displayRecommendations(recommendations) {
             const title = document.createElement("h3");
             title.textContent = movie;
 
-            const moreInfo = document.createElement("a");
-            moreInfo.href = imdbUrl;
-            moreInfo.textContent = "More Info";
-            moreInfo.target = "_blank"; // Open IMDb page in a new tab
-            moreInfo.style.color = "blue";
-
             card.appendChild(poster);
             card.appendChild(title);
-            card.appendChild(moreInfo);
             container.appendChild(card);
         }
 
@@ -106,11 +150,3 @@ async function displayRecommendations(recommendations) {
         recommendationsDiv.innerHTML = "<p>No recommendations available.</p>";
     }
 }
-
-// Load movie posters on page startup
-window.addEventListener("DOMContentLoaded", async function () {
-    const savedRecommendations = JSON.parse(localStorage.getItem("recommendations") || "[]");
-    if (savedRecommendations.length > 0) {
-        await displayRecommendations(savedRecommendations);
-    }
-});
