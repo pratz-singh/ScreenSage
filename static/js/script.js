@@ -44,14 +44,23 @@ async function fetchMoviePoster(movieName) {
 
         if (data.results && data.results.length > 0) {
             const posterPath = data.results[0].poster_path;
-            return `https://image.tmdb.org/t/p/w500${posterPath}`; // Full URL for the poster
+            return posterPath
+                ? `https://image.tmdb.org/t/p/w500${posterPath}` // TMDb poster URL
+                : await fetchFallbackPoster(movieName); // Fallback for missing poster
         } else {
-            return "https://via.placeholder.com/200x300?text=Poster+Not+Available"; // Placeholder if no poster is found
+            return await fetchFallbackPoster(movieName); // Fallback if movie not found
         }
     } catch (error) {
         console.error(`Error fetching poster for ${movieName}:`, error);
         return "https://via.placeholder.com/200x300?text=Error+Loading+Poster"; // Placeholder for errors
     }
+}
+
+async function fetchFallbackPoster(movieName) {
+    // Attempt IMDb link as fallback
+    const imdbSearchUrl = `https://www.imdb.com/find?q=${encodeURIComponent(movieName)}`;
+    console.warn(`Fallback: IMDb search URL - ${imdbSearchUrl}`);
+    return imdbSearchUrl;
 }
 
 async function displayRecommendations(recommendations) {
@@ -78,8 +87,15 @@ async function displayRecommendations(recommendations) {
             const title = document.createElement("h3");
             title.textContent = movie;
 
+            const link = document.createElement("a");
+            link.href = posterUrl.includes("imdb") ? posterUrl : "#";
+            link.textContent = "More Info";
+            link.target = "_blank";
+            link.style.color = "blue";
+
             card.appendChild(poster);
             card.appendChild(title);
+            card.appendChild(link);
             container.appendChild(card);
         }
 
@@ -88,3 +104,4 @@ async function displayRecommendations(recommendations) {
         recommendationsDiv.innerHTML = "<p>No recommendations available.</p>";
     }
 }
+
