@@ -163,7 +163,7 @@ main {
 }
 
 /* User Preferences */
-#recommendations {
+#recommendations, #preferences {
     background: linear-gradient(135deg, #3a3a3a, #1e1e1e);
     padding: 20px;
     border-radius: 12px;
