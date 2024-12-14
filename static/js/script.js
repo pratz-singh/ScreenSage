@@ -1,4 +1,3 @@
-// Load movies for rating on startup
 window.addEventListener("DOMContentLoaded", async function () {
     try {
         const response = await fetch("/initial-movies"); // Fetch initial movies from the server
