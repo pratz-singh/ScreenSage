@@ -217,7 +217,7 @@ main {
     box-shadow: 0 0 8px rgba(0, 123, 255, 0.8);
 }
 
-#recommend-button {
+#recommend-button, #no-movies {
     grid-column: 1 / -1;
     padding: 15px;
     font-size: 16px;
