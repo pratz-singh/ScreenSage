@@ -39,19 +39,51 @@
 
 
         <!-- Recommendations Section -->
-        <section id="preferences">
-            <h3>Or select your favorite genres:</h3>
-            <div id="genre-selection">
-                <label><input type="checkbox" name="genre" value="Action"> Action</label>
-                <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
-                <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
-                <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
-                <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
-                <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
-            </div>
-            <button id="no-movies" type="button">I Haven't Watched These Movies</button>
-           
-        </div>
+      <section id="user-preferences">
+            <h2>🎬 Customize Your Preferences</h2>
+            <form id="preferences-form">
+        
+                <!-- Merging the second genre selection -->
+                <div class="form-group" id="preferences">
+                    <label for="genre"><i class="fas fa-theater-masks"></i> Genre:</label>
+                    <div id="genre-selection">
+                        <label><input type="checkbox" name="genre" value="Action"> Action</label>
+                        <label><input type="checkbox" name="genre" value="Comedy"> Comedy</label>
+                        <label><input type="checkbox" name="genre" value="Drama"> Drama</label>
+                        <label><input type="checkbox" name="genre" value="Romance"> Romance</label>
+                        <label><input type="checkbox" name="genre" value="Horror"> Horror</label>
+                        <label><input type="checkbox" name="genre" value="Sci-Fi"> Sci-Fi</label>
+                    </div>
+                </div>
+        
+                <div class="form-group">
+                    <label for="rating"><i class="fas fa-star"></i> Minimum IMDb Rating:</label>
+                    <select id="rating">
+                        <option value="All">All</option>
+                        <option value="8">8+</option>
+                        <option value="7">7+</option>
+                        <option value="6">6+</option>
+                        <option value="5">5+</option>
+                    </select>
+                </div>
+        
+                <div class="form-group">
+                    <label for="runtime"><i class="fas fa-clock"></i> Runtime:</label>
+                    <select id="runtime">
+                        <option value="All">All</option>
+                        <option value="Short">Short (<90 mins)</option>
+                        <option value="Medium">Medium (90-120 mins)</option>
+                        <option value="Long">Long (>120 mins)</option>
+                    </select>
+                </div>
+        
+                <div class="form-group">
+                    <label for="year"><i class="fas fa-calendar-alt"></i> Year Released:</label>
+                    <input type="number" id="year" placeholder="Enter a year (e.g., 2010)">
+                </div>
+        
+                <button type="button" id="no-movies">🎥 Recommend</button>
+            </form>
         </section>
     </main>
     <footer>
