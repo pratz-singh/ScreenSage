@@ -89,13 +89,14 @@ document.getElementById("no-movies").addEventListener("click", async function ()
     displayRecommendations(limitedRecommendations);
 });
 
-// Fetch movie details using TMDb
+// Fetch movie details using TMDb and fallback to DuckDuckGo
 async function fetchMovieDetails(movieName) {
-    const apiKey = "19f7029362cd02135ed85c4810b35313"; // TMDb API Key
-    const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&api_key=${apiKey}`;
+    const tmdbApiKey = "19f7029362cd02135ed85c4810b35313"; // TMDb API Key
+    const tmdbUrl = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&api_key=${tmdbApiKey}`;
 
     try {
-        const response = await fetch(url);
+        // Attempt to fetch the poster from TMDb
+        const response = await fetch(tmdbUrl);
         const data = await response.json();
 
         if (data.results && data.results.length > 0) {
@@ -106,11 +107,35 @@ async function fetchMovieDetails(movieName) {
                     : null, // Poster URL or null if unavailable
             };
         } else {
-            return { posterUrl: null };
+            // Fallback to DuckDuckGo if no TMDb result
+            return await fetchDuckDuckGoImage(movieName);
         }
     } catch (error) {
         console.error(`Error fetching details for ${movieName}:`, error);
-        return { posterUrl: null };
+        // Use DuckDuckGo as a fallback
+        return await fetchDuckDuckGoImage(movieName);
+    }
+}
+
+// Fetch movie poster from DuckDuckGo (Fallback)
+async function fetchDuckDuckGoImage(movieName) {
+    const query = encodeURIComponent(`${movieName} movie poster`);
+    const url = `https://duckduckgo.com/i.js?q=${query}`;
+
+    try {
+        const response = await fetch(url, {
+            headers: { "User-Agent": "Mozilla/5.0" }, // Avoid bot detection
+        });
+        const data = await response.json();
+
+        if (data.results && data.results.length > 0) {
+            return { posterUrl: data.results[0].image }; // Use the first image result
+        } else {
+            return { posterUrl: null }; // No results found
+        }
+    } catch (error) {
+        console.error(`Error fetching DuckDuckGo image for ${movieName}:`, error);
+        return { posterUrl: null }; // Return null if error occurs
     }
 }
 
