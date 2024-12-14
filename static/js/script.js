@@ -1,3 +1,4 @@
+// Load movies for rating on startup
 window.addEventListener("DOMContentLoaded", async function () {
     try {
         const response = await fetch("/initial-movies"); // Fetch initial movies from the server
@@ -23,7 +24,7 @@ async function displayInitialMovies(movies) {
         poster.src = posterUrl
             ? posterUrl
             : "https://via.placeholder.com/200x300?text=No+Poster"; // Placeholder if no poster
-        poster.alt = ${movie.title} Poster;
+        poster.alt = `${movie.title} Poster`;
         poster.className = "movie-poster";
 
         const label = document.createElement("label");
@@ -32,14 +33,14 @@ async function displayInitialMovies(movies) {
         const select = document.createElement("select");
         select.className = "rating";
         select.dataset.movieId = movie.movieId; // Use the movie ID for rating submission
-        select.innerHTML = 
+        select.innerHTML = `
             <option value="">Rate</option>
             <option value="1">1</option>
             <option value="2">2</option>
             <option value="3">3</option>
             <option value="4">4</option>
             <option value="5">5</option>
-        ;
+        `;
 
         movieDiv.appendChild(poster);
         movieDiv.appendChild(label);
@@ -54,7 +55,7 @@ document.getElementById("rating-form").addEventListener("submit", async function
 
     const movieRatings = Array.from(document.querySelectorAll(".rating"))
         .filter(select => select.value) // Only include rated movies
-        .map(select => ${select.dataset.movieId}:${select.value})
+        .map(select => `${select.dataset.movieId}:${select.value}`)
         .join(",");
 
     const response = await fetch("/recommend", {
@@ -91,7 +92,7 @@ document.getElementById("no-movies").addEventListener("click", async function ()
 // Fetch movie details using TMDb
 async function fetchMovieDetails(movieName) {
     const apiKey = "19f7029362cd02135ed85c4810b35313"; // TMDb API Key
-    const url = https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&api_key=${apiKey};
+    const url = `https://api.themoviedb.org/3/search/movie?query=${encodeURIComponent(movieName)}&api_key=${apiKey}`;
 
     try {
         const response = await fetch(url);
@@ -101,14 +102,14 @@ async function fetchMovieDetails(movieName) {
             const movie = data.results[0]; // Take the first search result
             return {
                 posterUrl: movie.poster_path
-                    ? https://image.tmdb.org/t/p/w500${movie.poster_path}
+                    ? `https://image.tmdb.org/t/p/w500${movie.poster_path}`
                     : null, // Poster URL or null if unavailable
             };
         } else {
             return { posterUrl: null };
         }
     } catch (error) {
-        console.error(Error fetching details for ${movieName}:, error);
+        console.error(`Error fetching details for ${movieName}:`, error);
         return { posterUrl: null };
     }
 }
@@ -133,7 +134,7 @@ async function displayRecommendations(recommendations) {
             poster.src = posterUrl
                 ? posterUrl
                 : "https://via.placeholder.com/200x300?text=No+Poster"; // Display placeholder if no poster
-            poster.alt = ${movie} Poster;
+            poster.alt = `${movie} Poster`;
             poster.className = "movie-poster";
 
             const title = document.createElement("h3");
