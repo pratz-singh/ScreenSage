@@ -215,3 +215,91 @@ footer {
     color: #0f0;
 }
 
+
+
+
+
+
+
+
+#recommendations {
+        background-color: #2e2e2e; /* Dark theme background */
+        color: #ffffff; /* White text for contrast */
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Subtle shadow */
+        max-width: 600px;
+        margin: 0 auto;
+    }
+
+    #recommendations h3 {
+        text-align: center;
+        margin-bottom: 20px;
+        font-size: 1.5rem;
+        color: #f5a623; /* Accent color for the heading */
+    }
+
+    #movie-list {
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Two columns layout */
+        gap: 15px;
+    }
+
+    .movie {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px;
+        border: 1px solid #444444; /* Border for movie items */
+        border-radius: 5px;
+        background-color: #3a3a3a; /* Slightly lighter background */
+    }
+
+    .movie label {
+        font-size: 1rem;
+        color: #ffffff;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        width: 70%; /* Limit label width */
+    }
+
+    .rating {
+        font-size: 1rem;
+        background-color: #444444;
+        color: #ffffff;
+        border: none;
+        border-radius: 3px;
+        padding: 5px;
+    }
+
+    .rating:focus {
+        outline: none;
+        border: 1px solid #f5a623; /* Highlight on focus */
+    }
+
+    .btn {
+        display: block;
+        width: 100%;
+        background-color: #f5a623;
+        color: #ffffff;
+        border: none;
+        border-radius: 5px;
+        padding: 10px;
+        font-size: 1rem;
+        font-weight: bold;
+        margin-top: 20px;
+        cursor: pointer;
+        text-align: center;
+        transition: background-color 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #d48c1f; /* Slightly darker on hover */
+    }
+
+    .btn:focus {
+        outline: none;
+        box-shadow: 0 0 5px #f5a623; /* Glow effect on focus */
+    }
+
